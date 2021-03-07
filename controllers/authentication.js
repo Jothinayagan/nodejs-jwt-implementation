@@ -1,14 +1,26 @@
 const userModel = require('../model/user');
-const { registerValidation } = require('../script');
+const bcrypt = require('bcryptjs');
+const { registerValidation, loginValidation } = require('../script');
 
 const userRegistration = async (req, res) => {
 
-    const isValid = registerValidation(req.body);
+    // valid user data
+    const { error } = registerValidation(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
 
+    // checking user is already exists
+    const userExist = await userModel.findOne({ email: req.body.email });
+    if (userExist) return res.status(400).send('User already exist!');
+
+    // hash password using bcrypt
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+    // create a new user
     const user = new userModel({
         name: req.body.name,
         email: req.body.email,
-        password: req.body.password
+        password: hashedPassword
     });
 
     try {
@@ -19,4 +31,21 @@ const userRegistration = async (req, res) => {
     }
 };
 
-module.exports.registration = userRegistration;
+const userLogin = async (req, res) => {
+
+    // valid user data
+    const { error } = loginValidation(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    // checking user is already exists
+    const user = await userModel.findOne({ email: req.body.email });
+    if (!user) return res.status(400).send(`Email does not exist!`);
+
+    // validate password
+    const validPassword = await bcrypt.compare(req.body.password, user.password);
+    if(!validPassword) return res.status(400).send('Incorrect password!');
+
+    res.status(200).send("Logged in!!");
+}
+
+module.exports = { userRegistration: userRegistration, userLogin: userLogin };
