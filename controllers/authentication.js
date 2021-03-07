@@ -48,7 +48,7 @@ const userLogin = async (req, res) => {
 
     // create and sign JSON web token
     const token = jwt.sign({ _id: user._id }, process.env.SECRET_KEY);
-    res.status(200).header('auth-token').send(token);
+    res.status(200).header('auth-token', token).send(token);
 }
 
 module.exports = { userRegistration: userRegistration, userLogin: userLogin };
