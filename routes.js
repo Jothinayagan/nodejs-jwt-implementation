@@ -1,9 +1,11 @@
 const router = require('express').Router();
 
 // Import controllers
-const authentication = require('./controllers/authentication');
+const authController = require('./controllers/authentication');
+const quoteController = require('./controllers/fetchQuotes');
 
-router.post('/userRegistration', authentication.userRegistration);
-router.post('/login', authentication.userLogin)
+router.post('/userRegistration', authController.userRegistration);
+router.post('/login', authController.userLogin);
+router.get('/fetchQuotes', quoteController.fetchQuotes)
 
 module.exports = router;

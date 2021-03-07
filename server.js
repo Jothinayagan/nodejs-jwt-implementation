@@ -3,6 +3,7 @@ const app = express();
 const dotenv = require("dotenv");
 const mongoose = require('mongoose');
 const route = require('./routes');
+const { authUser } = require('./script');
 
 dotenv.config();
 const PORT = process.env.PORT;
@@ -14,6 +15,7 @@ mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopol
 app.use(express.json());
 
 // route
-app.use('/api', route);
+app.use('/auth', route);
+app.use('/api', authUser, route);
 
 app.listen(PORT, () => console.log(`Server up @ http://localhost:${PORT}`));
