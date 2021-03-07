@@ -1,7 +1,7 @@
 const userModel = require('../model/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { registerValidation, loginValidation } = require('../script');
+const { registerValidation, loginValidation, generateAuthToken } = require('../script');
 
 const userRegistration = async (req, res) => {
 
@@ -47,8 +47,10 @@ const userLogin = async (req, res) => {
     if (!validPassword) return res.status(400).send('Incorrect password!');
 
     // create and sign JSON web token
-    const token = jwt.sign({ _id: user._id }, process.env.SECRET_KEY);
-    res.status(200).header('auth-token', token).send(token);
+    const token = generateAuthToken(user);
+    // create refresh token
+    const refreshToken = jwt.sign({ _id: user._id }, process.env.REFRESH_SECRET_KEY)
+    res.status(200).header('auth-token', token).json({ accessToken: token, refreshToken: refreshToken });
 }
 
 module.exports = { userRegistration: userRegistration, userLogin: userLogin };
