@@ -1,3 +1,8 @@
-const router = require('express').Router;
+const router = require('express').Router();
 
-router.post('/');
+// Import controllers
+const authentication = require('./controllers/authentication');
+
+router.post('/userRegistration', authentication.registration);
+
+module.exports = router;
